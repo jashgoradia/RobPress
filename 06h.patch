@@ -1,0 +1,151 @@
+diff -ruN old/bootstrap.php new/bootstrap.php
+--- old/bootstrap.php	2018-10-30 16:20:22.000000000 +0000
++++ new/bootstrap.php	2019-11-26 00:08:22.000000000 +0000
+@@ -7,11 +7,23 @@
+ //Set up session
+ session_save_path(getcwd() . DIRECTORY_SEPARATOR . 'tmp');
+ 
+-//Check for database
++//Check for database configuration
+ if(!$f3->get('db')) {
+ 	die('Unable to read database configuration. Ensure your database configuration exists and is correct');
+ }
+ 
++//Connect to database
++$dbconfig = $f3->get('db');
++$db = new DB\SQL(
++	'mysql:host='.$dbconfig['server'].';port=3306;dbname='.$dbconfig['name'],
++	$dbconfig['username'],
++	$dbconfig['password']
++);
++$f3->set('DB',$db);
++
++//Enable SQL Sessions
++new \DB\SQL\Session($db);
++
+ //Check for settings 
+ $settings = Settings::getSettings();
+ if($settings['debug'] == 1) {
+diff -ruN old/CHANGELOG new/CHANGELOG
+--- old/CHANGELOG	2019-01-08 15:30:44.000000000 +0000
++++ new/CHANGELOG	2019-11-26 00:08:20.000000000 +0000
+@@ -1,3 +1,8 @@
++0.6h
++Updated TinyMCE editor
++Connect to DB in Bootstrap
++Change to SQL Sessions
++
+ 0.6g
+ Updated page handling and deletion
+ Updated to latest version of FatFree (3.6.5)
+diff -ruN old/controllers/user.php new/controllers/user.php
+--- old/controllers/user.php	2018-10-30 16:20:22.000000000 +0000
++++ new/controllers/user.php	2019-11-07 13:01:39.000000000 +0000
+@@ -43,7 +43,7 @@
+ 	}
+ 
+ 	public function login($f3) {
+-		/** YOU MAY NOT CHANGE THIS FUNCTION - Make any changes in Auth->checkLogin, Auth->login and afterLogin() */
++		/** YOU MAY NOT CHANGE THIS FUNCTION - Make any changes in Auth->checkLogin, Auth->login and afterLogin() (AuthHelper.php) */
+ 		if ($this->request->is('post')) {
+ 
+ 			//Check for debug mode
+diff -ruN old/models/database.php new/models/database.php
+--- old/models/database.php	2018-10-30 16:20:22.000000000 +0000
++++ new/models/database.php	2019-11-26 00:08:41.000000000 +0000
+@@ -7,16 +7,8 @@
+ 	
+ 	/** Return the single database connection */
+ 	public static function getConnection() {
+-		if(empty(self::$singleton)) {
+-			$f3=Base::instance();
+-			extract($f3->get('db'));
+-			self::$singleton=new DB\SQL(
+-					'mysql:host='.$server.';port=3306;dbname='.$name,
+-					$username,
+-					$password
+-					);
+-		}
+-		return self::$singleton;
++		$f3 = Base::instance();
++		return $f3->get('DB');
+ 	}	
+ 
+ 	/** Create a new database object */
+diff -ruN old/utility/form.php new/utility/form.php
+--- old/utility/form.php	2018-10-31 18:39:14.000000000 +0000
++++ new/utility/form.php	2019-11-26 00:08:54.000000000 +0000
+@@ -79,15 +79,12 @@
+  		{ name: 'links' },
+  		{ name: 'insert' },
+ 	],
+-	filebrowserUploadUrl: '$base/utility/upload.php'
+-}
+-
+-
+-);</script>
+-		";
++	filebrowserUploadUrl: '$base/utility/upload.php',
++	filebrowserUploadMethod: 'form'
++});
++</script>";
+ 	}
+ 
+-
+ 	public function password($options) {
+ 		return '<input type="password" class="form-control" id="' . $options['field'] . '" name="' . $options['field'] . '" placeholder="' . $options['placeholder'] . '" value="' . $options['value'] . '">';
+ 	}
+diff -ruN old/vendor/composer/ClassLoader.php new/vendor/composer/ClassLoader.php
+--- old/vendor/composer/ClassLoader.php	2019-01-08 15:21:18.000000000 +0000
++++ new/vendor/composer/ClassLoader.php	2019-11-26 00:11:13.000000000 +0000
+@@ -279,7 +279,7 @@
+      */
+     public function setApcuPrefix($apcuPrefix)
+     {
+-        $this->apcuPrefix = function_exists('apcu_fetch') && ini_get('apc.enabled') ? $apcuPrefix : null;
++        $this->apcuPrefix = function_exists('apcu_fetch') && filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) ? $apcuPrefix : null;
+     }
+ 
+     /**
+@@ -377,11 +377,11 @@
+             $subPath = $class;
+             while (false !== $lastPos = strrpos($subPath, '\\')) {
+                 $subPath = substr($subPath, 0, $lastPos);
+-                $search = $subPath.'\\';
++                $search = $subPath . '\\';
+                 if (isset($this->prefixDirsPsr4[$search])) {
++                    $pathEnd = DIRECTORY_SEPARATOR . substr($logicalPathPsr4, $lastPos + 1);
+                     foreach ($this->prefixDirsPsr4[$search] as $dir) {
+-                        $length = $this->prefixLengthsPsr4[$first][$search];
+-                        if (file_exists($file = $dir . DIRECTORY_SEPARATOR . substr($logicalPathPsr4, $length))) {
++                        if (file_exists($file = $dir . $pathEnd)) {
+                             return $file;
+                         }
+                     }
+diff -ruN old/VERSION new/VERSION
+--- old/VERSION	2019-01-08 15:30:26.000000000 +0000
++++ new/VERSION	2019-11-26 00:08:21.000000000 +0000
+@@ -1 +1 @@
+-0.6g
++0.6h
+diff -ruN old/view/header.htm new/view/header.htm
+--- old/view/header.htm	2019-01-08 15:36:02.000000000 +0000
++++ new/view/header.htm	2019-11-26 00:11:28.000000000 +0000
+@@ -5,7 +5,7 @@
+     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <meta name="description" content="">
+-    <meta name="generator" content="RobPress 0.6g - http://robpress.clicked.cc">
++    <meta name="generator" content="RobPress 0.6h - http://robpress.clicked.cc">
+     <?if($site['debug']):?>
+     <meta name="debug" content="Debug mode is enabled"/>
+     <?endif?>
+@@ -30,7 +30,7 @@
+ <script src="<?=$site['base']?>/js/jquery-1.10.9.alpha.js"></script>
+ 
+ <!-- CKEditor -->
+-<script src="//cdn.ckeditor.com/4.4.5/full/ckeditor.js"></script>
++<script src="https://cdn.ckeditor.com/4.13.0/full/ckeditor.js"></script>
+ 
+ <!-- Site Javascript -->
+ <script src="<?=$site['base']?>/js/site.js"></script>

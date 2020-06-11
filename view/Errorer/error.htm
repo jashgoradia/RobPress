@@ -1,0 +1,22 @@
+<h2>Error <?= $ERROR['code'] ?>: <?= $ERROR['status'] ?></h2>
+<hr/>
+<?if($user['level'] == 2 || $site['debug'] == 1):?>  <!-- if admin or if debug mode, allow viewing of stack trace -->
+<div class="alert alert-danger"><strong>Error</strong>: <?= $ERROR['text'] ?></div>
+
+<hr/>
+
+<?if(isset($ERROR['trace']) && !empty($ERROR['trace'])):?>
+
+<h4>Stack Trace</h4>
+
+<div class="well">
+<ol>
+<?=$ERROR['trace']?>
+</ol>
+</div>
+
+<?endif?>
+
+<?else:?>  <!-- else, do not display stack trace and only show error -->
+
+<?endif?>

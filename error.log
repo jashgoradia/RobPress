@@ -1,0 +1,26 @@
+[02-Dec-2019 12:53:06 America/New_York] PDOStatement: Table 'team2.settings' doesn't exist
+[02-Dec-2019 12:53:06 America/New_York] [vendor/bcosca/fatfree/lib/base.php:2261] Base->error()
+[02-Dec-2019 12:53:06 America/New_York] [vendor/bcosca/fatfree/lib/db/sql.php:235] user_error()
+[02-Dec-2019 12:53:06 America/New_York] [vendor/bcosca/fatfree/lib/db/sql.php:388] DB\SQL->exec()
+[02-Dec-2019 12:53:06 America/New_York] [vendor/bcosca/fatfree/lib/db/sql/mapper.php:696] DB\SQL->schema()
+[02-Dec-2019 12:53:06 America/New_York] [models/genericmodel.php:10] DB\SQL\Mapper->__construct()
+[02-Dec-2019 12:53:06 America/New_York] [utility/settings.php:7] GenericModel->__construct()
+[02-Dec-2019 12:53:06 America/New_York] [bootstrap.php:28] Settings::getSettings()
+[02-Dec-2019 12:53:06 America/New_York] [index.php:14] include_once('/var/www/html/bootstrap.php')
+[02-Dec-2019 12:53:06 America/New_York] PHP Fatal error:  PDOStatement: Table 'team2.cookies' doesn't exist in /var/www/html/vendor/bcosca/fatfree/lib/db/sql.php on line 235
+[02-Dec-2019 12:53:06 America/New_York] PDOStatement: Table 'team2.settings' doesn't exist
+[02-Dec-2019 12:53:06 America/New_York] [vendor/bcosca/fatfree/lib/base.php:2261] Base->error()
+[02-Dec-2019 12:53:06 America/New_York] [vendor/bcosca/fatfree/lib/db/sql.php:235] user_error()
+[02-Dec-2019 12:53:06 America/New_York] [vendor/bcosca/fatfree/lib/db/sql.php:388] DB\SQL->exec()
+[02-Dec-2019 12:53:06 America/New_York] [vendor/bcosca/fatfree/lib/db/sql/mapper.php:696] DB\SQL->schema()
+[02-Dec-2019 12:53:06 America/New_York] [models/genericmodel.php:10] DB\SQL\Mapper->__construct()
+[02-Dec-2019 12:53:06 America/New_York] [utility/settings.php:7] GenericModel->__construct()
+[02-Dec-2019 12:53:06 America/New_York] [bootstrap.php:28] Settings::getSettings()
+[02-Dec-2019 12:53:06 America/New_York] [index.php:14] include_once('/var/www/html/bootstrap.php')
+[02-Dec-2019 12:53:06 America/New_York] PHP Fatal error:  PDOStatement: Table 'team2.cookies' doesn't exist in /var/www/html/vendor/bcosca/fatfree/lib/db/sql.php on line 235
+[11-Jun-2020 15:02:51 America/New_York] HTTP 404 (GET /favicon.ico)
+[11-Jun-2020 15:02:51 America/New_York] [vendor/bcosca/fatfree/lib/base.php:1635] Base->error()
+[11-Jun-2020 15:02:51 America/New_York] [index.php:38] Base->run()
+[11-Jun-2020 15:03:55 America/New_York] HTTP 404 (GET /admin/favicon.ico)
+[11-Jun-2020 15:03:55 America/New_York] [vendor/bcosca/fatfree/lib/base.php:1635] Base->error()
+[11-Jun-2020 15:03:55 America/New_York] [index.php:38] Base->run()

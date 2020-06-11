@@ -1,0 +1,26 @@
+--- vendor/composer/ClassLoader.php	2019-01-08 15:21:18.000000000 +0000
++++ vendor/composer/ClassLoader.php	2019-11-26 00:11:13.000000000 +0000
+@@ -279,7 +279,7 @@
+      */
+     public function setApcuPrefix($apcuPrefix)
+     {
+-        $this->apcuPrefix = function_exists('apcu_fetch') && ini_get('apc.enabled') ? $apcuPrefix : null;
++        $this->apcuPrefix = function_exists('apcu_fetch') && filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN) ? $apcuPrefix : null;
+     }
+ 
+     /**
+@@ -377,11 +377,11 @@
+             $subPath = $class;
+             while (false !== $lastPos = strrpos($subPath, '\\')) {
+                 $subPath = substr($subPath, 0, $lastPos);
+-                $search = $subPath.'\\';
++                $search = $subPath . '\\';
+                 if (isset($this->prefixDirsPsr4[$search])) {
++                    $pathEnd = DIRECTORY_SEPARATOR . substr($logicalPathPsr4, $lastPos + 1);
+                     foreach ($this->prefixDirsPsr4[$search] as $dir) {
+-                        $length = $this->prefixLengthsPsr4[$first][$search];
+-                        if (file_exists($file = $dir . DIRECTORY_SEPARATOR . substr($logicalPathPsr4, $length))) {
++                        if (file_exists($file = $dir . $pathEnd)) {
+                             return $file;
+                         }
+                     }
